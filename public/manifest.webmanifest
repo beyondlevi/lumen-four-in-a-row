@@ -1,0 +1,18 @@
+{
+  "id": "cloud.bynd.lumen.fourinarow",
+  "name": "Four in a Row",
+  "short_name": "Four in a Row",
+  "version": "0.1.0",
+  "description": "The classic against the computer: drop your discs and get four in a row across, up or on a diagonal before it does. Three levels, a tally kept on the glasses, and the game waits, saved, for your return.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any monochrome"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any monochrome"}
+  ]
+}
