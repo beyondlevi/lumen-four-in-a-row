@@ -1,0 +1,208 @@
+/* The approved design at 600 x 600 CSS px, the viewport Lumen gives a web app.
+   The colors come from src/palette.ts as custom properties (--bg, --text, ...). */
+html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+body { display: flex; align-items: center; justify-content: center; }
+
+.game {
+  position: relative;
+  flex: none;
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Chakra Petch', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.game.loading { visibility: hidden; }
+.game :focus { outline: none; }
+[hidden] { display: none !important; }
+
+.bungee { font-family: Bungee, 'Chakra Petch', sans-serif; font-weight: 400; }
+
+/* Discs. Yours are filled; the computer's are rings with a center dot. */
+.disc { display: block; flex-shrink: 0; box-sizing: border-box; border-radius: 50%; }
+.disc.you { border: 2px solid var(--youRim); background: var(--you); }
+.disc.cpu { border: 3px solid var(--cpu); display: flex; align-items: center; justify-content: center; }
+.disc.cpu i { display: block; flex: none; border-radius: 50%; background: var(--cpu); }
+.disc.big { width: 54px; height: 54px; }
+.disc.cpu.big { border-width: 6px; }
+.disc.cpu.big i { width: 13px; height: 13px; }
+.disc.falling { background: var(--board); }
+
+/* Header: the wordmark, the small top bar, the tally. */
+.head, .result {
+  position: absolute; left: 57px; top: 10px; width: 486px; height: 48px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.logo { display: flex; flex-direction: column; }
+.logo-top { font-size: 25px; line-height: 26px; color: var(--text); }
+.logo-bottom { font-size: 14px; line-height: 18px; color: var(--sub); white-space: nowrap; }
+.minibar {
+  height: 46px; box-sizing: border-box; padding: 2px; border-radius: 23px; border: 2px solid var(--line);
+  background: var(--panel); display: flex; align-items: center; gap: 2px;
+}
+.mb {
+  width: 38px; height: 38px; box-sizing: border-box; border-radius: 19px; border: 2px solid transparent;
+  display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--sub);
+}
+.mb.wide { width: auto; padding: 0 12px; }
+.mb-icon { display: flex; }
+.mb-label { font-size: 17px; line-height: 20px; font-weight: 700; color: var(--text); white-space: nowrap; }
+
+.tally {
+  height: 48px; box-sizing: border-box; padding: 0 14px; border-radius: 10px; border: 2px solid var(--line);
+  display: flex; align-items: center; gap: 16px;
+}
+.t-col { display: flex; flex-direction: column; align-items: center; }
+.t-label { font-size: 14px; line-height: 16px; font-weight: 700; letter-spacing: 2px; color: var(--hint); }
+.t-value { font-size: 22px; line-height: 26px; font-weight: 700; color: var(--text); }
+.t-value.gain { padding: 0 7px; border-radius: 7px; background: var(--chip); color: var(--chipText); }
+/* VOCÊ and EMPATE are wider than YOU and DRAW: closer columns keep the header in its 486 px. */
+:lang(pt) .tally { gap: 10px; }
+.dim .head { opacity: 0.22; }
+
+/* The end screens' header. */
+.result-words { display: flex; flex-direction: column; min-width: 0; }
+.result-title { font-size: 28px; line-height: 30px; color: var(--accent); white-space: nowrap; }
+.result-sub { font-size: 15px; line-height: 18px; font-weight: 600; color: var(--sub); white-space: nowrap; }
+
+/* The open top bar. */
+.bar-wrap { position: absolute; left: 0; right: 0; top: 8px; display: flex; flex-direction: column; align-items: center; }
+.bar {
+  height: 54px; box-sizing: border-box; padding: 3px; border-radius: 27px; border: 2px solid var(--line);
+  background: var(--panel); display: flex; align-items: center; gap: 4px;
+}
+.bar-btn {
+  min-width: 44px; height: 44px; box-sizing: border-box; padding: 0; margin: 0; border-radius: 22px;
+  border: 2px solid transparent; background: transparent; color: var(--text); font: inherit; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.bar-btn.is-focus { padding: 0 12px; border: 3px solid var(--ring); background: var(--focus); }
+.bar-icon { display: flex; }
+.bar-label { display: none; font-size: 18px; line-height: 22px; font-weight: 700; color: var(--text); white-space: nowrap; padding-right: 4px; }
+.bar-btn.is-focus .bar-label { display: block; }
+.bar-btn[data-bar="level"] .bar-label { padding-right: 6px; }
+.bar-btn .levels { display: none; }
+.bar-btn.is-focus .levels { display: flex; }
+.bar-hint {
+  margin-top: 14px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-size: 17px; line-height: 22px; font-weight: 600; color: var(--sub); white-space: nowrap;
+}
+
+/* The levels, the current one in a chip. */
+.levels { display: flex; align-items: center; gap: 6px; }
+.lv { padding: 1px 3px; font-size: 17px; line-height: 22px; font-weight: 600; color: var(--sub); white-space: nowrap; }
+.lv.on { padding: 1px 9px; border-radius: 8px; background: var(--chip); font-weight: 700; color: var(--chipText); }
+
+/* The computer's turn. */
+.thinking {
+  position: absolute; left: 57px; top: 72px; height: 40px; box-sizing: border-box; padding: 0 16px 0 10px;
+  border-radius: 20px; border: 2px solid var(--line); background: var(--panel);
+  display: flex; align-items: center; gap: 10px;
+}
+.thinking-label { font-size: 18px; line-height: 22px; font-weight: 700; color: var(--text); }
+.dots { display: flex; align-items: center; gap: 5px; padding-top: 4px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--trail); animation: dot 900ms steps(1) infinite; }
+.dots i:nth-child(1) { animation-delay: -600ms; }
+.dots i:nth-child(2) { animation-delay: -300ms; }
+@keyframes dot {
+  0% { background: var(--ring); }
+  33% { background: var(--hint); }
+  66% { background: var(--trail); }
+}
+
+/* Your disc, held over the column you aim at. */
+.hover {
+  position: absolute; top: 64px; width: 54px;
+  display: flex; flex-direction: column; align-items: center; color: var(--ring);
+}
+
+/* The board. */
+.board {
+  position: absolute; box-sizing: border-box; padding: 10px;
+  border-radius: 18px; border: 2px solid var(--frame); background: var(--board);
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr));
+}
+.board.play { left: 57px; top: 136px; width: 486px; height: 420px; --d: 54px; --rw: 6px; --dot: 13px; }
+.board.end { left: 106px; top: 72px; width: 388px; height: 336px; --d: 40px; --rw: 4px; --dot: 10px; }
+.board.dimmed { opacity: 0.22; }
+.cell { position: relative; display: flex; align-items: center; justify-content: center; }
+.cell.aim { background: var(--aim); }
+.cell.aim.top { border-radius: 12px 12px 0 0; }
+.cell.aim.bottom { border-radius: 0 0 12px 12px; }
+.cell .disc { width: var(--d); height: var(--d); }
+.cell .disc.hole { border: 2px solid var(--hole); }
+.cell .disc.ghost { border: 2px dashed var(--ghost); }
+.cell .disc.cpu { border-width: var(--rw); }
+.cell .disc.cpu i { width: var(--dot); height: var(--dot); }
+.cell .disc.you.win { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--win); }
+.cell .mark { position: absolute; left: 0; top: 0; color: var(--mark); }
+.win-line { position: absolute; overflow: visible; pointer-events: none; }
+
+/* A disc falling into its cell, with motion lines above it. */
+.fall { position: absolute; left: 0; top: 0; width: 54px; height: 54px; will-change: transform; }
+.fall .trail { position: absolute; left: 0; top: -60px; overflow: visible; stroke: var(--trail); }
+
+.foot {
+  position: absolute; left: 0; right: 0; top: 566px; text-align: center;
+  font-size: 16px; line-height: 20px; font-weight: 600; color: var(--hint); white-space: nowrap;
+}
+
+/* First open: aim, then drop. */
+.first {
+  position: absolute; left: 125px; top: 188px; width: 350px; box-sizing: border-box; padding: 22px 24px;
+  border-radius: 18px; border: 2px solid var(--line); background: var(--panel);
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.first-arrows { display: flex; align-items: center; gap: 18px; color: var(--text); }
+.first-drop { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.first-title { font-size: 22px; line-height: 26px; color: var(--text); white-space: nowrap; }
+.first-text { font-size: 18px; line-height: 23px; font-weight: 600; color: var(--sub); text-align: center; white-space: pre-line; }
+.legend { display: flex; align-items: center; gap: 10px; font-size: 18px; line-height: 22px; font-weight: 700; color: var(--text); }
+.legend-you { padding-right: 10px; }
+
+/* How to play. */
+.howto {
+  position: absolute; left: 60px; top: 36px; width: 480px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+.howto-title { font-size: 34px; line-height: 38px; color: var(--text); }
+.how { display: flex; align-items: center; gap: 16px; }
+.how-icon { flex: none; width: 96px; display: flex; align-items: center; justify-content: center; color: var(--text); }
+.how-pair { display: flex; gap: 10px; }
+.how-mark { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+.how-mark .mark { position: absolute; left: 0; top: 0; color: var(--mark); }
+.how-words { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.how-title { font-size: 20px; line-height: 24px; font-weight: 700; color: var(--text); }
+.how-text { font-size: 17px; line-height: 21px; font-weight: 600; color: var(--sub); }
+.rule { height: 2px; background: var(--line); }
+.howto-controls { font-size: 18px; line-height: 24px; font-weight: 600; color: var(--sub); white-space: pre-line; }
+
+/* New game? */
+.panel {
+  position: absolute; left: 100px; width: 400px; box-sizing: border-box; padding: 24px;
+  border-radius: 18px; border: 2px solid var(--line); background: var(--panel);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.newgame { top: 180px; }
+.panel-head { display: flex; flex-direction: column; gap: 4px; padding-bottom: 6px; }
+.panel-title { font-size: 30px; line-height: 34px; color: var(--text); }
+.panel-sub { font-size: 18px; line-height: 22px; font-weight: 600; color: var(--sub); }
+.rows { display: flex; flex-direction: column; gap: 12px; }
+
+.row {
+  height: 60px; box-sizing: border-box; padding: 0 18px; margin: 0; width: 100%;
+  border-radius: 12px; border: 2px solid var(--line); background: var(--panel);
+  display: flex; align-items: center; gap: 14px; text-align: left;
+  font: inherit; color: var(--text); cursor: pointer;
+}
+.row.is-focus { border: 3px solid var(--ring); background: var(--focus); }
+.row svg { flex: none; }
+.row-icon { display: flex; }
+.row-label { font-size: 21px; line-height: 24px; font-weight: 700; white-space: nowrap; }
+.row-note { margin-left: auto; font-size: 15px; line-height: 18px; font-weight: 600; color: var(--hint); white-space: nowrap; }
+.row .levels { margin-left: auto; }
+
+/* The end screens' rows. */
+.end-rows { position: absolute; left: 106px; top: 422px; width: 388px; display: flex; flex-direction: column; gap: 10px; }
